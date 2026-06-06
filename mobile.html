@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F6F6F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F0F0F" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Wash Me — Автомойка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4BB8E8;--blue-deep:#2A9FD0;--blue-glow:rgba(75,184,232,.14);
+  --yellow:#F5D000;--yellow-glow:rgba(245,208,0,.14);--grey:#9E9E9E;
+  --bg:#F6F6F2;--bg2:#EEEEE9;--card:#FFFFFF;
+  --ink:#111111;--ink2:#444444;--ink3:#888888;
+  --bdr:#E0E0D8;--bdrs:#C8C8C0;
+  --rsm:10px;--rmd:14px;--rlg:18px;--rxl:22px;--r2xl:28px;
+  --ease:cubic-bezier(.4,0,.2,1);--spring:cubic-bezier(.34,1.56,.64,1);
+  --t:.25s;
+  --ssh:0 2px 8px rgba(0,0,0,.06);--smh:0 6px 20px rgba(0,0,0,.09);--slh:0 16px 40px rgba(0,0,0,.11);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-top:env(safe-area-inset-top,0px);
+}
+[data-theme="dark"]{
+  --bg:#0F0F0F;--bg2:#171717;--card:#1C1C1C;
+  --ink:#F0F0EC;--ink2:#A0A098;--ink3:#555550;
+  --bdr:#282824;--bdrs:#383830;
+  --blue-glow:rgba(75,184,232,.10);--yellow-glow:rgba(245,208,0,.08);
+  --ssh:0 2px 8px rgba(0,0,0,.4);--smh:0 6px 20px rgba(0,0,0,.5);--slh:0 16px 40px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  padding-bottom:calc(72px + var(--safe-bottom));
+  transition:background var(--t) var(--ease),color var(--t) var(--ease)}
+a{text-decoration:none;color:inherit}
+h1,h2,h3,h4{font-family:"Nunito",sans-serif;font-weight:800}
+button{cursor:pointer;font-family:inherit;border:none;background:none;-webkit-appearance:none}
+section{padding:56px 0}
+
+/* ── LAYOUT ── */
+.px{padding-left:20px;padding-right:20px}
+.anim{opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.anim.vis{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;
+  height:calc(56px + var(--safe-top));
+  padding-top:var(--safe-top);
+  background:color-mix(in srgb,var(--bg) 90%,transparent);
+  border-bottom:1px solid var(--bdr);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  transition:background var(--t)
+}
+.logo{display:flex;align-items:center;gap:9px}
+.lmarks{display:flex}
+.lm{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.lm+.lm{margin-left:-6px}
+.lm-drop{background:var(--blue)}.lm-wheel{background:var(--grey)}.lm-smile{background:var(--yellow)}
+.lname{font-family:"Nunito",sans-serif;font-size:16px;font-weight:900;letter-spacing:-.02em;color:var(--ink)}
+.lsub{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-top:1px}
+
+/* Theme toggle */
+.tog{width:44px;height:26px;border-radius:100px;background:var(--bg2);
+  border:1.5px solid var(--bdrs);position:relative;padding:2px;display:flex;align-items:center}
+.tok{width:18px;height:18px;border-radius:50%;background:var(--ink);
+  transition:transform .35s var(--spring),background .25s}
+[data-theme="dark"] .tok{transform:translateX(18px);background:var(--yellow)}
+
+/* ── HERO ── */
+.hero{
+  padding-top:calc(56px + var(--safe-top) + 24px);
+  padding-bottom:32px;
+  position:relative;overflow:hidden;min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.hero::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--bdr) 1px,transparent 1px),
+  linear-gradient(90deg,var(--bdr) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.35;pointer-events:none}
+[data-theme="dark"] .hero::before{opacity:.1}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;animation:drift 9s ease-in-out infinite}
+.o1{width:280px;height:280px;background:var(--blue);opacity:.1;top:-60px;right:-60px}
+.o2{width:200px;height:200px;background:var(--yellow);opacity:.08;bottom:80px;left:-40px;animation-delay:3s}
+[data-theme="dark"] .o1{opacity:.18}[data-theme="dark"] .o2{opacity:.13}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-16px,-20px) scale(1.05)}}
+
+.hbadge{display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 7px;
+  background:var(--card);border:1.5px solid var(--bdr);border-radius:100px;
+  margin-bottom:16px;box-shadow:var(--ssh)}
+.bdot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex-shrink:0;
+  animation:pg 2s infinite;box-shadow:0 0 0 3px rgba(34,197,94,.18)}
+@keyframes pg{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.18)}50%{box-shadow:0 0 0 5px rgba(34,197,94,.06)}}
+.hbadge span{font-family:"Nunito",sans-serif;font-size:11px;font-weight:800;color:var(--ink2)}
+
+.h1{font-size:clamp(36px,10vw,52px);font-weight:900;letter-spacing:-.03em;line-height:1.04;margin-bottom:14px}
+.h1 em{font-style:italic;color:var(--blue)}
+.hp{font-size:15px;color:var(--ink2);line-height:1.65;margin-bottom:24px}
+
+.hctas{display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 22px;border-radius:100px;font-family:"Nunito",sans-serif;
+  font-size:14px;font-weight:800;transition:all var(--t) var(--ease);
+  white-space:nowrap;border:none}
+.b-ink{background:var(--ink);color:var(--bg);flex:1}
+.b-ink:active{background:var(--blue);transform:scale(.98)}
+.b-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--bdrs);flex:1}
+.b-ghost:active{border-color:var(--blue);color:var(--blue)}
+.b-blue{background:var(--blue);color:#fff}
+.b-blue:active{background:var(--blue-deep);transform:scale(.98)}
+.b-full{width:100%;padding:15px 22px;font-size:15px}
+
+/* Hero stats */
+.hstats{display:flex;border:1.5px solid var(--bdr);border-radius:var(--rxl);
+  background:var(--card);overflow:hidden;box-shadow:var(--ssh);margin-top:28px}
+.hs{flex:1;padding:12px 0;display:flex;flex-direction:column;align-items:center;
+  border-right:1.5px solid var(--bdr)}
+.hs:last-child{border-right:none}
+.hsv{font-family:"Nunito",sans-serif;font-size:20px;font-weight:900;
+  letter-spacing:-.04em;color:var(--ink);line-height:1}
+.hsy{color:var(--yellow)}
+.hsl{font-size:10px;color:var(--ink3);font-weight:700;margin-top:2px}
+
+/* ── QUICK SERVICES CARD ── */
+.qcard{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rxl);
+  overflow:hidden;box-shadow:var(--smh);margin-top:20px}
+.qctop{padding:14px 18px 12px;border-bottom:1.5px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between}
+.qclabel{font-family:"Nunito",sans-serif;font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink3)}
+.qcbadge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  background:var(--yellow-glow);border-radius:100px;
+  font-family:"Nunito",sans-serif;font-size:10px;font-weight:800;color:#8a7000}
+[data-theme="dark"] .qcbadge{color:var(--yellow)}
+.srows{padding:8px 12px}
+.srow{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 10px;border-radius:var(--rmd);margin-bottom:4px;
+  active:background:var(--bg2);transition:background .15s}
+.srow:active{background:var(--bg2)}
+.srl{display:flex;align-items:center;gap:9px}
+.sicw{width:32px;height:32px;border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sn{font-family:"Nunito",sans-serif;font-size:13px;font-weight:700;color:var(--ink)}
+.sp{font-family:"Nunito",sans-serif;font-size:12px;font-weight:800;color:var(--blue);white-space:nowrap}
+.qcfoot{padding:12px 16px 16px}
+.htag{display:flex;align-items:center;gap:7px;padding:9px 14px;
+  background:var(--bg2);border:1.5px solid var(--bdr);border-radius:var(--rmd);
+  margin-top:10px;font-size:12px;color:var(--ink2);font-weight:600}
+.hdot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex-shrink:0}
+
+/* ── TICKER ── */
+.ticker{background:var(--ink);overflow:hidden;padding:13px 0;
+  border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr)}
+[data-theme="dark"] .ticker{background:var(--blue)}
+.ttrack{display:flex;white-space:nowrap;animation:scroll-l 28s linear infinite}
+.titem{display:inline-flex;align-items:center;gap:8px;padding:0 22px;
+  font-family:"Nunito",sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--bg)}
+[data-theme="dark"] .titem{color:#fff}
+.tsep{width:4px;height:4px;border-radius:50%;background:var(--yellow);flex-shrink:0}
+[data-theme="dark"] .tsep{background:rgba(255,255,255,.5)}
+@keyframes scroll-l{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SERVICES ── */
+#services{background:var(--bg2);padding:48px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+.eyebrow::before{content:"";width:16px;height:2px;background:var(--blue);border-radius:2px}
+.stitle{font-size:clamp(26px,7vw,34px);font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.stitle em{font-style:italic;color:var(--blue)}
+.sdesc{font-size:14px;color:var(--ink2);line-height:1.65;margin-top:10px}
+
+/* Horizontal scroll cards */
+.sscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  margin:0 -20px;padding:4px 20px 16px}
+.sscroll::-webkit-scrollbar{display:none}
+.scards{display:flex;gap:12px;width:max-content}
+
+.sc{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rxl);
+  padding:22px 20px;width:220px;flex-shrink:0;position:relative;overflow:hidden;
+  transition:transform .2s var(--ease)}
+.sc:active{transform:scale(.98)}
+.sc::after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--yellow));transform:scaleX(0)}
+.sc-feat{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+[data-theme="dark"] .sc-feat{background:linear-gradient(145deg,#1a2a3a,#0d1a26);border-color:var(--bdrs)}
+.sc-feat .sct,.sc-feat .scd{color:inherit}
+.sc-feat .scd{opacity:.6}.sc-feat .scp{color:var(--yellow)}
+.scico{width:44px;height:44px;border-radius:var(--rmd);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.sc-feat .scico{background:rgba(255,255,255,.12)}
+.sct{font-family:"Nunito",sans-serif;font-size:16px;font-weight:800;
+  letter-spacing:-.02em;color:var(--ink);margin-bottom:6px}
+.scd{font-size:12px;color:var(--ink2);line-height:1.55}
+.scp{font-family:"Nunito",sans-serif;font-size:18px;font-weight:900;
+  color:var(--blue);margin-top:14px;letter-spacing:-.04em}
+.scp span{font-size:12px;font-weight:600;color:var(--ink3)}
+
+.scroll-hint{display:flex;align-items:center;gap:6px;margin-top:4px;
+  font-size:11px;color:var(--ink3);font-weight:700}
+.sh-dots{display:flex;gap:4px}
+.sh-dot{width:6px;height:6px;border-radius:50%;background:var(--bdr)}
+.sh-dot.a{background:var(--blue);width:16px;border-radius:3px}
+
+/* ── PRICING ── */
+#pricing{background:var(--bg);padding:48px 0}
+.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  padding:0 20px 2px;margin:0 -20px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;
+  font-family:"Nunito",sans-serif;font-size:12px;font-weight:800;
+  border:1.5px solid var(--bdr);background:transparent;color:var(--ink2);
+  white-space:nowrap;flex-shrink:0;transition:all .2s}
+.tab:active{transform:scale(.96)}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+[data-theme="dark"] .tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.tab svg{width:13px;height:13px}
+.panel{display:none}.panel.on{display:block;animation:fadeup .25s var(--ease)}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.pgrp{margin-bottom:24px}
+.pgt{font-family:"Nunito",sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);padding-bottom:8px;margin-bottom:8px;
+  border-bottom:1.5px solid var(--bdr)}
+.pr{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:var(--card);border:1.5px solid var(--bdr);
+  border-radius:var(--rmd);margin-bottom:6px;transition:background .15s}
+.pr:active{background:var(--blue-glow);border-color:var(--blue)}
+.prn{font-size:13px;font-weight:600;color:var(--ink)}
+.prv{font-family:"Nunito",sans-serif;font-size:13px;font-weight:800;color:var(--blue);white-space:nowrap;margin-left:10px}
+
+/* ── REVIEWS ── */
+#reviews{background:var(--bg2);padding:48px 0}
+.revtop{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rxl);
+  padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:20px;box-shadow:var(--ssh)}
+.rnbig{font-family:"Nunito",sans-serif;font-size:52px;font-weight:900;letter-spacing:-.05em;color:var(--ink);line-height:1}
+.rsbig{display:flex;gap:2px;margin-top:4px}
+.rsbig span{font-size:16px;color:var(--yellow)}
+.rcnt{font-size:11px;color:var(--ink3);font-weight:700;margin-top:3px}
+.rdiv{width:1px;height:56px;background:var(--bdr);flex-shrink:0}
+.gplace{display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:var(--yellow-glow);border:1.5px solid color-mix(in srgb,var(--yellow) 22%,transparent);
+  border-radius:var(--rmd)}
+.gplace strong{font-family:"Nunito",sans-serif;font-size:12px;font-weight:800;color:var(--ink);display:block}
+.gplace small{font-size:10px;color:var(--ink3);font-weight:700}
+
+/* Review scroll */
+.rscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  margin:0 -20px;padding:4px 20px 16px}
+.rscroll::-webkit-scrollbar{display:none}
+.rcards{display:flex;gap:12px;width:max-content}
+.rc{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rxl);
+  padding:20px;width:280px;flex-shrink:0;transition:transform .2s}
+.rc:active{transform:scale(.98)}
+.rcs{display:flex;gap:2px;margin-bottom:10px}
+.rcs span{color:var(--yellow);font-size:13px}
+.rct{font-size:13px;line-height:1.65;color:var(--ink2);margin-bottom:14px}
+.rca{display:flex;align-items:center;gap:9px}
+.rcav{width:32px;height:32px;border-radius:50%;background:var(--blue-glow);
+  border:1.5px solid color-mix(in srgb,var(--blue) 20%,transparent);
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Nunito",sans-serif;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0}
+.rcn{font-family:"Nunito",sans-serif;font-size:12px;font-weight:800;color:var(--ink)}
+.rcd{font-size:10px;color:var(--ink3);font-weight:700;margin-top:1px}
+
+/* ── BRANDS ── */
+.brands{padding:36px 0;overflow:hidden;background:var(--bg);
+  border-top:1.5px solid var(--bdr);border-bottom:1.5px solid var(--bdr)}
+.btrack{display:flex;gap:10px;white-space:nowrap;animation:scroll-l 20s linear infinite}
+.bpill{display:inline-flex;padding:8px 16px;flex-shrink:0;
+  background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rmd);
+  font-family:"Nunito",sans-serif;font-size:12px;font-weight:800;color:var(--ink2)}
+
+/* ── FEATURES ── */
+#features{background:var(--bg2);padding:48px 0}
+.fscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  margin:0 -20px;padding:4px 20px 16px}
+.fscroll::-webkit-scrollbar{display:none}
+.fcards{display:flex;gap:12px;width:max-content}
+.fc{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rxl);
+  padding:20px 18px;width:180px;flex-shrink:0;transition:transform .2s}
+.fc:active{transform:scale(.98)}
+.fcico{width:40px;height:40px;border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.fct{font-family:"Nunito",sans-serif;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:6px;letter-spacing:-.01em}
+.fcd{font-size:12px;color:var(--ink2);line-height:1.6}
+
+/* ── ABOUT ── */
+#about{background:var(--bg);padding:48px 0}
+.astats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.as{background:var(--bg2);border:1.5px solid var(--bdr);border-radius:var(--rlg);padding:16px}
+.asv{font-family:"Nunito",sans-serif;font-size:26px;font-weight:900;letter-spacing:-.04em;color:var(--ink)}
+.asv .u{font-size:14px;color:var(--blue)}
+.asl{font-size:11px;color:var(--ink3);font-weight:700;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.tag{display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--bg2);
+  border:1.5px solid var(--bdr);border-radius:100px;font-size:11px;font-weight:700;
+  color:var(--ink2);font-family:"Nunito",sans-serif}
+.tag:active{border-color:var(--blue);color:var(--blue)}
+
+/* ── CTA BANNER ── */
+.ctabanner{margin:0;padding:32px 20px}
+.ctai{background:var(--ink);border-radius:var(--r2xl);padding:32px 24px;
+  text-align:center;position:relative;overflow:hidden}
+[data-theme="dark"] .ctai{background:linear-gradient(135deg,#0e1a28,#0a1420);border:1.5px solid var(--bdrs)}
+.ctai::before{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;
+  border-radius:50%;background:var(--blue);opacity:.12;filter:blur(50px)}
+.ctah{font-family:"Nunito",sans-serif;font-size:26px;font-weight:900;letter-spacing:-.03em;
+  line-height:1.1;color:#fff;position:relative;z-index:1}
+.ctah em{font-style:italic;color:var(--yellow)}
+.ctap{font-size:14px;color:rgba(255,255,255,.6);margin-top:8px;position:relative;z-index:1}
+.ctabs{display:flex;flex-direction:column;gap:10px;margin-top:22px;position:relative;z-index:1}
+.bcw{background:#fff;color:#111;padding:14px;border-radius:100px;
+  font-family:"Nunito",sans-serif;font-weight:900;font-size:15px;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.bcw:active{background:var(--yellow);transform:scale(.98)}
+.bcg{background:rgba(255,255,255,.08);color:#fff;
+  border:1.5px solid rgba(255,255,255,.18);padding:13px;border-radius:100px;
+  font-family:"Nunito",sans-serif;font-weight:700;font-size:14px;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.bcg:active{background:rgba(255,255,255,.14)}
+
+/* ── CONTACTS ── */
+#contacts{background:var(--bg2);padding:48px 0 24px}
+.ccard{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rxl);padding:24px;box-shadow:var(--ssh);margin-bottom:12px}
+.cit{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1.5px solid var(--bdr)}
+.cit:last-of-type{border-bottom:none}
+.ciico{width:38px;height:38px;border-radius:var(--rsm);background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--blue)}
+.clbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:3px}
+.cval{font-family:"Nunito",sans-serif;font-size:15px;font-weight:800;color:var(--ink)}
+.cval a:hover{color:var(--blue)}
+.csub{font-size:12px;color:var(--ink2);font-weight:600;margin-top:1px}
+.ctbig{font-family:"Nunito",sans-serif;font-size:20px;font-weight:900;letter-spacing:-.04em;color:var(--blue);margin-top:2px}
+.cexts{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.cext{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--rmd);
+  padding:12px 16px;display:flex;align-items:center;gap:10px}
+.cext.yt{background:var(--yellow-glow);border-color:color-mix(in srgb,var(--yellow) 22%,transparent)}
+.cxt-t{font-family:"Nunito",sans-serif;font-size:13px;font-weight:800;color:var(--ink)}
+.cxt-s{font-size:11px;color:var(--ink3);font-weight:700;margin-top:1px}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:color-mix(in srgb,var(--card) 94%,transparent);
+  border-top:1px solid var(--bdr);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:flex;align-items:stretch;
+  padding-bottom:var(--safe-bottom);
+  transition:transform .3s var(--ease)
+}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 4px 10px;gap:4px;cursor:pointer;
+  font-family:"Nunito",sans-serif;font-size:10px;font-weight:700;
+  color:var(--ink3);border:none;background:none;
+  transition:color .2s;-webkit-tap-highlight-color:transparent}
+.bnav-item:active{transform:scale(.94)}
+.bnav-item.call{background:var(--blue);border-radius:16px;margin:6px 6px calc(6px + var(--safe-bottom));
+  color:#fff;font-size:13px;font-weight:800;gap:5px;flex:1.4;padding:10px 8px}
+.bnav-item.call:active{background:var(--blue-deep)}
+.bnav-item.on{color:var(--blue)}
+.bni{width:22px;height:22px;display:block}
+.bnav-item.call .bni{width:18px;height:18px}
+
+/* ── FOOTER ── */
+footer{padding:32px 0 20px;border-top:1.5px solid var(--bdr)}
+.ft-simple{display:flex;flex-direction:column;gap:20px}
+.flinks{display:flex;flex-direction:column;gap:10px}
+.flinks a{font-size:14px;font-weight:600;color:var(--ink2)}
+.flinks a:active{color:var(--blue)}
+.fch{font-family:"Nunito",sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink3);margin-bottom:12px}
+.fcp{font-size:12px;color:var(--ink3);font-weight:600;margin-top:16px;padding-top:16px;border-top:1.5px solid var(--bdr)}
+
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0);pointer-events:none;transition:background .3s}
+.drawer-overlay.open{background:rgba(0,0,0,.5);pointer-events:auto}
+.drawer{position:fixed;bottom:0;left:0;right:0;z-index:201;
+  background:var(--bg);border-radius:24px 24px 0 0;
+  padding:0 0 calc(24px + var(--safe-bottom));
+  transform:translateY(100%);transition:transform .4s var(--spring)}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{width:40px;height:4px;border-radius:2px;background:var(--bdrs);margin:12px auto 0}
+.drawer-title{font-family:"Nunito",sans-serif;font-size:18px;font-weight:800;
+  padding:16px 20px 12px;color:var(--ink);border-bottom:1px solid var(--bdr)}
+.drawer-body{padding:16px 20px;overflow-y:auto;max-height:70svh}
+.drawer-row{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;background:var(--card);border:1.5px solid var(--bdr);
+  border-radius:var(--rmd);margin-bottom:8px;transition:background .15s}
+.drawer-row:active{background:var(--blue-glow);border-color:var(--blue)}
+.dr-name{font-family:"Nunito",sans-serif;font-size:14px;font-weight:700;color:var(--ink)}
+.dr-val{font-family:"Nunito",sans-serif;font-size:14px;font-weight:800;color:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar" id="topbar">
+  <a href="#" class="logo">
+    <div class="lmarks">
+      <div class="lm lm-drop"><svg style="width:12px;height:14px;fill:white" viewBox="0 0 16 20"><path d="M8 0C8 0 0 8 0 13a8 8 0 0016 0C16 8 8 0 8 0z"/></svg></div>
+      <div class="lm lm-wheel"><svg style="width:12px;height:12px;fill:none;stroke:white;stroke-width:1.6;stroke-linecap:round" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="2" fill="white" stroke="none"/><line x1="9" y1="2" x2="9" y2="4.5"/><line x1="9" y1="13.5" x2="9" y2="16"/><line x1="2" y1="9" x2="4.5" y2="9"/><line x1="13.5" y1="9" x2="16" y2="9"/></svg></div>
+      <div class="lm lm-smile"><svg style="width:12px;height:12px;fill:none;stroke:white;stroke-width:1.6;stroke-linecap:round" viewBox="0 0 16 16"><circle cx="5.5" cy="6" r="1.2" fill="white" stroke="none"/><circle cx="10.5" cy="6" r="1.2" fill="white" stroke="none"/><path d="M4.5 10c1 2 6 2 7 0"/></svg></div>
+    </div>
+    <div style="display:flex;flex-direction:column;line-height:1">
+      <span class="lname">Wash Me</span>
+      <span class="lsub">Автомойка · Шиномонтаж</span>
+    </div>
+  </a>
+  <button class="tog" id="themeToggle"><div class="tok"></div></button>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="px" style="position:relative;z-index:1">
+    <div class="hbadge anim"><div class="bdot"></div><span>Открыто · 8:00 — 20:00</span></div>
+    <h1 class="h1 anim d1">Чистота —<br>это <em>стиль</em><br>жизни</h1>
+    <p class="hp anim d2">Детейлинг, шиномонтаж и антигравийная защита в Хамовниках. Рейтинг 4.9 · 628 клиентов.</p>
+    <div class="hctas anim d3">
+      <a href="tel:+74952977775" class="btn b-ink">
+        <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.32 19.79 19.79 0 01.02 0.67 2 2 0 012 .5h3a2 2 0 012 1.72 13 13 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.36A16 16 0 0015.64 17.9l1.22-1.22a2 2 0 012.11-.45 13 13 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        Позвонить
+      </a>
+      <a href="#pricing" class="btn b-ghost">Прайс</a>
+    </div>
+    <div class="hstats anim d3">
+      <div class="hs"><div class="hsv"><span class="hsy">★</span> 4.9</div><div class="hsl">628 оценок</div></div>
+      <div class="hs"><div class="hsv">10+</div><div class="hsl">Зон мойки</div></div>
+      <div class="hs"><div class="hsv">8–20</div><div class="hsl">Ежедневно</div></div>
+    </div>
+    <div class="qcard anim d3">
+      <div class="qctop">
+        <span class="qclabel">Быстрый прайс</span>
+        <span class="qcbadge"><svg style="width:9px;height:9px;fill:currentColor" viewBox="0 0 20 20"><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7"/></svg> 2026</span>
+      </div>
+      <div class="srows">
+        <div class="srow"><div class="srl"><div class="sicw" style="background:rgba(75,184,232,.12)"><svg style="width:16px;height:16px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M2 12h20M12 2a15 15 0 010 20"/></svg></div><span class="sn">Детейлинг мойка</span></div><span class="sp">от 2 300 ₽</span></div>
+        <div class="srow"><div class="srl"><div class="sicw" style="background:rgba(158,158,158,.14)"><svg style="width:16px;height:16px;fill:none;stroke:var(--grey);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg></div><span class="sn">Шиномонтаж</span></div><span class="sp">от 1 600 ₽</span></div>
+        <div class="srow"><div class="srl"><div class="sicw" style="background:rgba(245,208,0,.14)"><svg style="width:16px;height:16px;fill:none;stroke:var(--yellow);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18A9 9 0 0012 3z"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div><span class="sn">Полировка</span></div><span class="sp">от 1 000 ₽</span></div>
+        <div class="srow"><div class="srl"><div class="sicw" style="background:rgba(75,184,232,.12)"><svg style="width:16px;height:16px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7l-9-5z"/><polyline points="9 12 11 14 15 10"/></svg></div><span class="sn">Антигравий</span></div><span class="sp">от 90 000 ₽</span></div>
+      </div>
+      <div class="qcfoot">
+        <a href="tel:+74952977775" class="btn b-blue b-full">
+          <svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.32 19.79 19.79 0 01.02 0.67 2 2 0 012 .5h3a2 2 0 012 1.72 13 13 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.36A16 16 0 0015.64 17.9l1.22-1.22a2 2 0 012.11-.45 13 13 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          Записаться на мойку
+        </a>
+        <div class="htag"><div class="hdot"></div>Ежедневно 8:00–20:00 · Саввинская наб., 25</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker"><div class="ttrack">
+  <span class="titem"><span class="tsep"></span>Оплата картой</span>
+  <span class="titem"><span class="tsep"></span>Парковка</span>
+  <span class="titem"><span class="tsep"></span>Wi-Fi</span>
+  <span class="titem"><span class="tsep"></span>Кафе</span>
+  <span class="titem"><span class="tsep"></span>10 зон мойки</span>
+  <span class="titem"><span class="tsep"></span>Рейтинг 4.9 ★</span>
+  <span class="titem"><span class="tsep"></span>Хорошее место 2026</span>
+  <span class="titem"><span class="tsep"></span>Хранение шин</span>
+  <span class="titem"><span class="tsep"></span>Мотошиномонтаж</span>
+  <span class="titem"><span class="tsep"></span>Оплата картой</span>
+  <span class="titem"><span class="tsep"></span>Парковка</span>
+  <span class="titem"><span class="tsep"></span>Wi-Fi</span>
+  <span class="titem"><span class="tsep"></span>Кафе</span>
+  <span class="titem"><span class="tsep"></span>10 зон мойки</span>
+  <span class="titem"><span class="tsep"></span>Рейтинг 4.9 ★</span>
+  <span class="titem"><span class="tsep"></span>Хорошее место 2026</span>
+  <span class="titem"><span class="tsep"></span>Хранение шин</span>
+  <span class="titem"><span class="tsep"></span>Мотошиномонтаж</span>
+</div></div>
+
+<!-- SERVICES -->
+<section id="services">
+<div class="px">
+  <div class="eyebrow anim">Наши услуги</div>
+  <h2 class="stitle anim d1">Всё для <em>вашего</em> авто</h2>
+  <p class="sdesc anim d2">Профессиональная химия и оборудование.</p>
+</div>
+<div class="sscroll anim d3">
+  <div class="scards">
+    <div class="sc sc-feat">
+      <div class="scico"><svg style="width:28px;height:28px;fill:none;stroke:rgba(255,255,255,.9);stroke-width:1.6;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg></div>
+      <div class="sct">Детейлинг мойка</div>
+      <div class="scd">Трёхфазная бесконтактная мойка, удаление битума и реагентов.</div>
+      <div class="scp">от 2 300 ₽ <span>/ авто</span></div>
+    </div>
+    <div class="sc">
+      <div class="scico" style="background:rgba(158,158,158,.12)"><svg style="width:28px;height:28px;fill:none;stroke:var(--grey);stroke-width:1.6;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="3" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="21" y2="12"/><line x1="5.6" y1="5.6" x2="8.5" y2="8.5"/><line x1="15.5" y1="15.5" x2="18.4" y2="18.4"/></svg></div>
+      <div class="sct">Шиномонтаж</div>
+      <div class="scd">R13–R26, RunFlat, мотошиномонтаж. Хранение 6 мес.</div>
+      <div class="scp">от 1 600 ₽ <span>/ 4 кол.</span></div>
+    </div>
+    <div class="sc">
+      <div class="scico" style="background:rgba(245,208,0,.12)"><svg style="width:28px;height:28px;fill:none;stroke:var(--yellow);stroke-width:1.6;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18A9 9 0 0012 3z"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.5 1.5M16.9 16.9l1.5 1.5"/></svg></div>
+      <div class="sct">Полировка</div>
+      <div class="scd">Восстановительная и защитная. 2–4 слоя покрытия.</div>
+      <div class="scp">от 1 000 ₽ <span>/ лок.</span></div>
+    </div>
+    <div class="sc">
+      <div class="scico" style="background:rgba(75,184,232,.10)"><svg style="width:28px;height:28px;fill:none;stroke:var(--blue);stroke-width:1.6;stroke-linecap:round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="sct">Химчистка</div>
+      <div class="scd">Полная химчистка салона. LeTech средства.</div>
+      <div class="scp">от 1 500 ₽ <span>/ эл.</span></div>
+    </div>
+    <div class="sc">
+      <div class="scico" style="background:rgba(75,184,232,.10)"><svg style="width:28px;height:28px;fill:none;stroke:var(--blue);stroke-width:1.6;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7l-9-5z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <div class="sct">Антигравий</div>
+      <div class="scd">SunTek и Quantum. Зоны риска или полная оклейка.</div>
+      <div class="scp">от 90 000 ₽</div>
+    </div>
+    <div class="sc">
+      <div class="scico" style="background:rgba(245,208,0,.12)"><svg style="width:28px;height:28px;fill:none;stroke:var(--yellow);stroke-width:1.6;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21"/></svg></div>
+      <div class="sct">Покраска дисков</div>
+      <div class="scd">Алмазная проточка, покраска R14–R24.</div>
+      <div class="scp">от 14 000 ₽</div>
+    </div>
+  </div>
+</div>
+<div class="px" style="margin-top:4px">
+  <div class="scroll-hint"><div class="sh-dots"><div class="sh-dot a"></div><div class="sh-dot"></div><div class="sh-dot"></div><div class="sh-dot"></div></div><span>Листайте вправо</span></div>
+</div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+<div class="px">
+  <div class="eyebrow anim">Прозрачные цены</div>
+  <h2 class="stitle anim d1">Прайс-лист</h2>
+</div>
+<div style="padding:16px 20px 0" class="anim d2">
+  <div class="tabs">
+    <button class="tab on" onclick="sw('tire',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="3" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="21" y2="12"/></svg>Шиномонтаж</button>
+    <button class="tab" onclick="sw('storage',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Хранение</button>
+    <button class="tab" onclick="sw('wash',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M2 12h20M12 2a15 15 0 010 20"/></svg>Мойка</button>
+    <button class="tab" onclick="sw('polish',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a9 9 0 100 18A9 9 0 0012 3z"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>Полировка</button>
+    <button class="tab" onclick="sw('clean',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Химчистка</button>
+    <button class="tab" onclick="sw('tint',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M2 13h20" stroke-dasharray="3 2"/></svg>Тонировка</button>
+    <button class="tab" onclick="sw('film',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7l-9-5z"/><polyline points="9 12 11 14 15 10"/></svg>Антигравий</button>
+    <button class="tab" onclick="sw('wheels',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Диски</button>
+  </div>
+</div>
+<div class="px" style="margin-top:16px">
+  <div class="panel on" id="p-tire">
+    <div class="pgrp"><div class="pgt">Легковые</div>
+      <div class="pr"><span class="prn">R13</span><span class="prv">1 600 ₽</span></div>
+      <div class="pr"><span class="prn">R14</span><span class="prv">1 920 ₽</span></div>
+      <div class="pr"><span class="prn">R15</span><span class="prv">2 400 ₽</span></div>
+      <div class="pr"><span class="prn">R16</span><span class="prv">2 880 ₽</span></div>
+      <div class="pr"><span class="prn">R17</span><span class="prv">3 360 ₽</span></div>
+      <div class="pr"><span class="prn">R18</span><span class="prv">3 840 ₽</span></div>
+      <div class="pr"><span class="prn">R19</span><span class="prv">4 640 ₽</span></div>
+      <div class="pr"><span class="prn">R20</span><span class="prv">5 280 ₽</span></div>
+      <div class="pr"><span class="prn">R21</span><span class="prv">5 920 ₽</span></div>
+      <div class="pr"><span class="prn">R22</span><span class="prv">6 560 ₽</span></div>
+      <div class="pr"><span class="prn">R23</span><span class="prv">7 520 ₽</span></div>
+    </div>
+    <div class="pgrp"><div class="pgt">RunFlat</div>
+      <div class="pr"><span class="prn">RunFlat R16</span><span class="prv">3 680 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R17</span><span class="prv">4 480 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R18</span><span class="prv">5 280 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R19</span><span class="prv">6 320 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R20</span><span class="prv">7 200 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R21</span><span class="prv">8 160 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R22</span><span class="prv">9 040 ₽</span></div>
+      <div class="pr"><span class="prn">RunFlat R23</span><span class="prv">10 160 ₽</span></div>
+    </div>
+    <div class="pgrp"><div class="pgt">Джип / Автобус</div>
+      <div class="pr"><span class="prn">R14 Джип</span><span class="prv">2 720 ₽</span></div>
+      <div class="pr"><span class="prn">R15 Джип</span><span class="prv">3 040 ₽</span></div>
+      <div class="pr"><span class="prn">R16 Джип</span><span class="prv">3 360 ₽</span></div>
+      <div class="pr"><span class="prn">R17 Джип</span><span class="prv">4 000 ₽</span></div>
+      <div class="pr"><span class="prn">R18 Джип</span><span class="prv">4 640 ₽</span></div>
+      <div class="pr"><span class="prn">R19 Джип</span><span class="prv">5 280 ₽</span></div>
+      <div class="pr"><span class="prn">R20 Джип</span><span class="prv">6 240 ₽</span></div>
+      <div class="pr"><span class="prn">R24 Джип</span><span class="prv">12 000 ₽</span></div>
+      <div class="pr"><span class="prn">R25 Джип</span><span class="prv">15 200 ₽</span></div>
+      <div class="pr"><span class="prn">R26 Джип</span><span class="prv">18 720 ₽</span></div>
+      <div class="pr"><span class="prn">Комплекс Броня</span><span class="prv">30 000 ₽</span></div>
+    </div>
+  </div>
+  <div class="panel" id="p-storage">
+    <div class="pgrp"><div class="pgt">Без дисков (6 мес.)</div>
+      <div class="pr"><span class="prn">R13–15</span><span class="prv">3 300 ₽</span></div>
+      <div class="pr"><span class="prn">R16</span><span class="prv">3 600 ₽</span></div>
+      <div class="pr"><span class="prn">R17</span><span class="prv">3 900 ₽</span></div>
+      <div class="pr"><span class="prn">R18</span><span class="prv">4 200 ₽</span></div>
+      <div class="pr"><span class="prn">R19</span><span class="prv">4 800 ₽</span></div>
+      <div class="pr"><span class="prn">R20</span><span class="prv">5 400 ₽</span></div>
+      <div class="pr"><span class="prn">R21</span><span class="prv">6 000 ₽</span></div>
+      <div class="pr"><span class="prn">R22</span><span class="prv">6 600 ₽</span></div>
+      <div class="pr"><span class="prn">R23</span><span class="prv">7 200 ₽</span></div>
+      <div class="pr"><span class="prn">R24</span><span class="prv">7 800 ₽</span></div>
+      <div class="pr"><span class="prn">R25</span><span class="prv">8 400 ₽</span></div>
+      <div class="pr"><span class="prn">R26</span><span class="prv">9 000 ₽</span></div>
+      <div class="pr"><span class="prn">R27</span><span class="prv">9 600 ₽</span></div>
+      <div class="pr"><span class="prn">Броня</span><span class="prv">12 000 ₽</span></div>
+    </div>
+    <div class="pgrp"><div class="pgt">На дисках (6 мес.)</div>
+      <div class="pr"><span class="prn">R13–15 на дисках</span><span class="prv">4 950 ₽</span></div>
+      <div class="pr"><span class="prn">R16 на дисках</span><span class="prv">5 400 ₽</span></div>
+      <div class="pr"><span class="prn">R17 на дисках</span><span class="prv">5 850 ₽</span></div>
+      <div class="pr"><span class="prn">R18 на дисках</span><span class="prv">6 300 ₽</span></div>
+      <div class="pr"><span class="prn">R19 на дисках</span><span class="prv">7 200 ₽</span></div>
+      <div class="pr"><span class="prn">R20 на дисках</span><span class="prv">8 100 ₽</span></div>
+      <div class="pr"><span class="prn">R21 на дисках</span><span class="prv">9 000 ₽</span></div>
+      <div class="pr"><span class="prn">R22 на дисках</span><span class="prv">9 900 ₽</span></div>
+      <div class="pr"><span class="prn">R23 на дисках</span><span class="prv">10 800 ₽</span></div>
+      <div class="pr"><span class="prn">R24 на дисках</span><span class="prv">11 700 ₽</span></div>
+      <div class="pr"><span class="prn">R25 на дисках</span><span class="prv">12 600 ₽</span></div>
+      <div class="pr"><span class="prn">R26 на дисках</span><span class="prv">13 500 ₽</span></div>
+      <div class="pr"><span class="prn">Броня на дисках</span><span class="prv">18 000 ₽</span></div>
+    </div>
+  </div>
+  <div class="panel" id="p-wash">
+    <div class="pr"><span class="prn">Мойка «стандарт» (3-фазная)</span><span class="prv">от 2 300 ₽</span></div>
+    <div class="pr"><span class="prn">Комплексная мойка (3-фазная)</span><span class="prv">от 3 300 ₽</span></div>
+    <div class="pr"><span class="prn">Детейлинг уход (Комплекс)</span><span class="prv">от 7 000 ₽</span></div>
+    <div class="pr"><span class="prn">Детейлинг уход салона</span><span class="prv">2 500 ₽</span></div>
+    <div class="pr"><span class="prn">Уборка салона</span><span class="prv">1 500 ₽</span></div>
+    <div class="pr"><span class="prn">Уборка багажника</span><span class="prv">500 ₽</span></div>
+    <div class="pr"><span class="prn">Полимер HIDRO SHINE</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Удаление почек / насекомых</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Удаление металлических вкраплений</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Удаление битума</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Удаление реагента</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Кварцевое покрытие ULTRA</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Химчистка дисков (4 шт)</span><span class="prv">2 500 ₽</span></div>
+    <div class="pr"><span class="prn">Ароматизация</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Озонация салона</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Антидождь (полусфера)</span><span class="prv">3 500 ₽</span></div>
+    <div class="pr"><span class="prn">Антидождь (вся сфера)</span><span class="prv">7 000 ₽</span></div>
+    <div class="pr"><span class="prn">Антидождь (с панорамой)</span><span class="prv">9 000 ₽</span></div>
+    <div class="pr"><span class="prn">Мойка двигателя</span><span class="prv">10 000 ₽</span></div>
+    <div class="pr"><span class="prn">Мойка подвески</span><span class="prv">от 12 000 ₽</span></div>
+    <div class="pr"><span class="prn">Химчистка кузова</span><span class="prv">от 5 000 ₽</span></div>
+    <div class="pr"><span class="prn">Твёрдый воск</span><span class="prv">от 7 000 ₽</span></div>
+  </div>
+  <div class="panel" id="p-polish">
+    <div class="pr"><span class="prn">Локальная полировка</span><span class="prv">1 000 ₽</span></div>
+    <div class="pr"><span class="prn">Полировка оптики</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Полировка вставок</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Подготовка к полировке</span><span class="prv">4 000 ₽</span></div>
+    <div class="pr"><span class="prn">Гибридный воск</span><span class="prv">8 000 ₽</span></div>
+    <div class="pr"><span class="prn">Полировка стёкол</span><span class="prv">11 000 ₽</span></div>
+    <div class="pr"><span class="prn">Восковый пирог</span><span class="prv">14 000 ₽</span></div>
+    <div class="pr"><span class="prn">Защитное покрытие для плёнки</span><span class="prv">20 000 ₽</span></div>
+    <div class="pr"><span class="prn">Восстановительная (под оклейку)</span><span class="prv">21 000 ₽</span></div>
+    <div class="pr"><span class="prn">Покрытие 2 слоя + полировка</span><span class="prv">от 50 000 ₽</span></div>
+    <div class="pr"><span class="prn">Покрытие 4 слоя + полировка</span><span class="prv">от 70 000 ₽</span></div>
+  </div>
+  <div class="panel" id="p-clean">
+    <div class="pr"><span class="prn">Коврики (1 шт)</span><span class="prv">200 ₽</span></div>
+    <div class="pr"><span class="prn">Частичная чистка</span><span class="prv">500 ₽</span></div>
+    <div class="pr"><span class="prn">Руль</span><span class="prv">1 000 ₽</span></div>
+    <div class="pr"><span class="prn">Дверные карты</span><span class="prv">1 000 ₽</span></div>
+    <div class="pr"><span class="prn">Багажник</span><span class="prv">1 000 ₽</span></div>
+    <div class="pr"><span class="prn">LeTech чистка сиденья</span><span class="prv">1 500 ₽</span></div>
+    <div class="pr"><span class="prn">Сиденье ткань</span><span class="prv">1 500 ₽</span></div>
+    <div class="pr"><span class="prn">LeTech защитный крем</span><span class="prv">2 000 ₽</span></div>
+    <div class="pr"><span class="prn">Потолок</span><span class="prv">3 000 ₽</span></div>
+    <div class="pr"><span class="prn">Пол</span><span class="prv">3 000 ₽</span></div>
+    <div class="pr"><span class="prn">Пакет LeTech комплекс</span><span class="prv">9 000 ₽</span></div>
+    <div class="pr"><span class="prn">Полная химчистка</span><span class="prv">от 16 000 ₽</span></div>
+  </div>
+  <div class="panel" id="p-tint">
+    <div class="pr"><span class="prn">Форточка маленькая</span><span class="prv">700 ₽</span></div>
+    <div class="pr"><span class="prn">Форточка большая</span><span class="prv">1 300 ₽</span></div>
+    <div class="pr"><span class="prn">Два боковых (тонировка)</span><span class="prv">6 000 ₽</span></div>
+    <div class="pr"><span class="prn">Два боковых (атермальная)</span><span class="prv">6 500 ₽</span></div>
+    <div class="pr"><span class="prn">Лобовое стекло</span><span class="prv">8 000 ₽</span></div>
+    <div class="pr"><span class="prn">Заднее стекло</span><span class="prv">8 000 ₽</span></div>
+    <div class="pr"><span class="prn">Окраска суппортов</span><span class="prv">65 000 ₽</span></div>
+  </div>
+  <div class="panel" id="p-film">
+    <div class="pgrp"><div class="pgt">SunTek</div>
+      <div class="pr"><span class="prn">Зоны риска «Стандарт»</span><span class="prv">105 000 ₽</span></div>
+      <div class="pr"><span class="prn">Зоны риска «Расширенный»</span><span class="prv">110 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная (без бамперов)</span><span class="prv">240 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная (без крыши)</span><span class="prv">270 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная прозрачная</span><span class="prv">300 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная матовая</span><span class="prv">310 000 ₽</span></div>
+    </div>
+    <div class="pgrp"><div class="pgt">Quantum</div>
+      <div class="pr"><span class="prn">Зоны риска «Стандарт»</span><span class="prv">90 000 ₽</span></div>
+      <div class="pr"><span class="prn">Зоны риска «Расширенный»</span><span class="prv">100 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная (без бамперов)</span><span class="prv">210 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная прозрачная</span><span class="prv">270 000 ₽</span></div>
+      <div class="pr"><span class="prn">Полная матовая</span><span class="prv">280 000 ₽</span></div>
+    </div>
+  </div>
+  <div class="panel" id="p-wheels">
+    <div class="pgrp"><div class="pgt">Правка диска (1 шт)</div>
+      <div class="pr"><span class="prn">R14</span><span class="prv">1 200 ₽</span></div>
+      <div class="pr"><span class="prn">R15</span><span class="prv">1 400 ₽</span></div>
+      <div class="pr"><span class="prn">R16</span><span class="prv">1 800 ₽</span></div>
+      <div class="pr"><span class="prn">R17</span><span class="prv">2 000 ₽</span></div>
+      <div class="pr"><span class="prn">R18</span><span class="prv">2 600 ₽</span></div>
+      <div class="pr"><span class="prn">R19</span><span class="prv">2 800 ₽</span></div>
+      <div class="pr"><span class="prn">R20</span><span class="prv">3 000 ₽</span></div>
+      <div class="pr"><span class="prn">R21</span><span class="prv">3 700 ₽</span></div>
+      <div class="pr"><span class="prn">R22</span><span class="prv">4 400 ₽</span></div>
+      <div class="pr"><span class="prn">R23</span><span class="prv">5 100 ₽</span></div>
+      <div class="pr"><span class="prn">R24</span><span class="prv">5 900 ₽</span></div>
+    </div>
+    <div class="pgrp"><div class="pgt">Покраска (4 шт)</div>
+      <div class="pr"><span class="prn">R15</span><span class="prv">16 000 ₽</span></div>
+      <div class="pr"><span class="prn">R16</span><span class="prv">17 000 ₽</span></div>
+      <div class="pr"><span class="prn">R17</span><span class="prv">18 000 ₽</span></div>
+      <div class="pr"><span class="prn">R18</span><span class="prv">19 000 ₽</span></div>
+      <div class="pr"><span class="prn">R19</span><span class="prv">20 000 ₽</span></div>
+      <div class="pr"><span class="prn">R20</span><span class="prv">21 000 ₽</span></div>
+      <div class="pr"><span class="prn">R21</span><span class="prv">22 000 ₽</span></div>
+      <div class="pr"><span class="prn">R22</span><span class="prv">23 000 ₽</span></div>
+      <div class="pr"><span class="prn">R23</span><span class="prv">24 000 ₽</span></div>
+      <div class="pr"><span class="prn">R24</span><span class="prv">25 000 ₽</span></div>
+    </div>
+    <div class="pgrp"><div class="pgt">Алмазная проточка</div>
+      <div class="pr"><span class="prn">R15–R16</span><span class="prv">14 000 ₽</span></div>
+      <div class="pr"><span class="prn">R17–R18</span><span class="prv">14 000 ₽</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+<div class="px">
+  <div class="eyebrow anim">Отзывы клиентов</div>
+  <h2 class="stitle anim d1">Нам <em>доверяют</em></h2>
+  <div class="revtop anim d2">
+    <div>
+      <div class="rnbig">4.9</div>
+      <div class="rsbig"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+      <div class="rcnt">628 оценок</div>
+    </div>
+    <div class="rdiv"></div>
+    <div>
+      <div class="gplace">
+        <svg style="width:18px;height:18px;fill:var(--yellow);flex-shrink:0" viewBox="0 0 20 20"><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7"/></svg>
+        <div><strong>Хорошее место 2026</strong><small>Яндекс Карты</small></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="rscroll anim d3">
+  <div class="rcards">
+    <div class="rc">
+      <div class="rcs"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+      <p class="rct">Одна из лучших моек по соотношению цена/качество. Оперативно и очень качественно с удобной зоной ожидания.</p>
+      <div class="rca"><div class="rcav">ДР</div><div><div class="rcn">Дмитрий Рендель</div><div class="rcd">Знаток 11 ур. · дек 2025</div></div></div>
+    </div>
+    <div class="rc">
+      <div class="rcs"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+      <p class="rct">Лучшая мойка в Хамовниках. Много лет мою тут машины. Летом можно подождать с видом на реку.</p>
+      <div class="rca"><div class="rcav">Д</div><div><div class="rcn">Даниил</div><div class="rcd">Знаток 12 ур. · апр 2025</div></div></div>
+    </div>
+    <div class="rc">
+      <div class="rcs"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+      <p class="rct">Приехал на комплексную мойку — получил её. Отдаёшь ключи, идёшь в кафе, ждёшь и получаешь чистую машину.</p>
+      <div class="rca"><div class="rcav">АМ</div><div><div class="rcn">Агван Мкоян</div><div class="rcd">Знаток 15 ур. · мар 2025</div></div></div>
+    </div>
+    <div class="rc">
+      <div class="rcs"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+      <p class="rct">Ещё одна мойка порадовала сервисом! Живая очередь с утра, всё организованно и без суеты.</p>
+      <div class="rca"><div class="rcav">SY</div><div><div class="rcn">Sl Ya</div><div class="rcd">Знаток 11 ур. · мар 2025</div></div></div>
+    </div>
+    <div class="rc">
+      <div class="rcs"><span>★</span><span>★</span><span>★</span><span>★</span><span style="color:var(--bdr)">★</span></div>
+      <p class="rct">Пользуюсь больше года. Моют хорошо, стоимость разумная. В целом рекомендую.</p>
+      <div class="rca"><div class="rcav">АР</div><div><div class="rcn">Алексей Ры</div><div class="rcd">Знаток 6 ур. · янв 2025</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="px" style="margin-top:4px">
+  <div class="scroll-hint"><div class="sh-dots"><div class="sh-dot a"></div><div class="sh-dot"></div><div class="sh-dot"></div><div class="sh-dot"></div></div><span>Листайте вправо</span></div>
+</div>
+</section>
+
+<!-- BRANDS -->
+<div class="brands">
+  <div style="overflow:hidden"><div class="btrack">
+    <div class="bpill">Mercedes-Benz</div><div class="bpill">BMW</div>
+    <div class="bpill">Toyota</div><div class="bpill">Volkswagen</div>
+    <div class="bpill">Audi</div><div class="bpill">Volvo</div>
+    <div class="bpill">Nissan</div><div class="bpill">Kia</div>
+    <div class="bpill">Hyundai</div><div class="bpill">Porsche</div>
+    <div class="bpill">Land Rover</div><div class="bpill">Lexus</div>
+    <div class="bpill">Rolls-Royce</div><div class="bpill">Tesla</div>
+    <div class="bpill">Ferrari</div><div class="bpill">Mercedes-Benz</div>
+    <div class="bpill">BMW</div><div class="bpill">Toyota</div>
+    <div class="bpill">Volkswagen</div><div class="bpill">Audi</div>
+    <div class="bpill">Volvo</div><div class="bpill">Nissan</div>
+    <div class="bpill">Kia</div><div class="bpill">Hyundai</div>
+    <div class="bpill">Porsche</div><div class="bpill">Land Rover</div>
+    <div class="bpill">Lexus</div><div class="bpill">Tesla</div>
+    <div class="bpill">Ferrari</div>
+  </div></div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+<div class="px">
+  <div class="eyebrow anim">Почему мы</div>
+  <h2 class="stitle anim d1">Наши <em>преимущества</em></h2>
+</div>
+<div class="fscroll anim d2">
+  <div class="fcards">
+    <div class="fc">
+      <div class="fcico" style="background:rgba(75,184,232,.12)"><svg style="width:22px;height:22px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <div class="fct">Качество</div>
+      <div class="fcd">Профессиональная химия и оборудование.</div>
+    </div>
+    <div class="fc">
+      <div class="fcico" style="background:rgba(245,208,0,.12)"><svg style="width:22px;height:22px;fill:none;stroke:var(--yellow);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+      <div class="fct">Кафе и Wi-Fi</div>
+      <div class="fcd">Удобная зона ожидания с кофе и сетью.</div>
+    </div>
+    <div class="fc">
+      <div class="fcico" style="background:rgba(75,184,232,.12)"><svg style="width:22px;height:22px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <div class="fct">Набережная</div>
+      <div class="fcd">Вид на Москву-реку прямо напротив.</div>
+    </div>
+    <div class="fc">
+      <div class="fcico" style="background:rgba(158,158,158,.12)"><svg style="width:22px;height:22px;fill:none;stroke:var(--grey);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="3" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="21" y2="12"/></svg></div>
+      <div class="fct">10 зон мойки</div>
+      <div class="fcd">Без очередей и задержек.</div>
+    </div>
+    <div class="fc">
+      <div class="fcico" style="background:rgba(245,208,0,.12)"><svg style="width:22px;height:22px;fill:var(--yellow)" viewBox="0 0 20 20"><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7"/></svg></div>
+      <div class="fct">Рейтинг 4.9</div>
+      <div class="fcd">628 реальных отзывов. Хорошее место 2026.</div>
+    </div>
+    <div class="fc">
+      <div class="fcico" style="background:rgba(75,184,232,.12)"><svg style="width:22px;height:22px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+      <div class="fct">Хранение шин</div>
+      <div class="fcd">6 мес., R13–R27, с дисками и без.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+<div class="px">
+  <div class="eyebrow anim">О нас</div>
+  <h2 class="stitle anim d1">Wash Me — <em>чистота</em> как стиль</h2>
+  <p style="font-size:14px;color:var(--ink2);line-height:1.7;margin-top:12px" class="anim d2">Находимся в Хамовниках на Саввинской набережной. Работаем ежедневно 8:00–20:00. Полный спектр детейлинговых услуг.</p>
+  <div class="astats anim d2">
+    <div class="as"><div class="asv">4.9<span class="u"> ★</span></div><div class="asl">Рейтинг</div></div>
+    <div class="as"><div class="asv">628<span class="u">+</span></div><div class="asl">Клиентов</div></div>
+    <div class="as"><div class="asv">10<span class="u"> зон</span></div><div class="asl">Мойка</div></div>
+    <div class="as"><div class="asv">12<span class="u"> ч</span></div><div class="asl">Каждый день</div></div>
+  </div>
+  <div class="tags anim d3">
+    <span class="tag">💳 Карта</span>
+    <span class="tag">🅿️ Парковка</span>
+    <span class="tag">☕ Кафе</span>
+    <span class="tag">📶 Wi-Fi</span>
+    <span class="tag">🎁 Сертификаты</span>
+    <span class="tag">⚖️ Балансировка</span>
+    <span class="tag">🔒 Хранение шин</span>
+    <span class="tag">🛵 Мотошиномонтаж</span>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<div class="ctabanner">
+  <div class="ctai anim">
+    <h2 class="ctah">Готовы к <em>идеальной</em> чистоте?</h2>
+    <p class="ctap">Ежедневно 8:00–20:00 · Хамовники</p>
+    <div class="ctabs">
+      <a href="tel:+74952977775" class="bcw">
+        <svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.32 19.79 19.79 0 01.02 0.67 2 2 0 012 .5h3a2 2 0 012 1.72 13 13 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.36A16 16 0 0015.64 17.9l1.22-1.22a2 2 0 012.11-.45 13 13 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+        Позвонить сейчас
+      </a>
+      <a href="https://yandex.ru/maps/org/wash_me/183062604106/" target="_blank" class="bcg">
+        <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        На карте
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACTS -->
+<section id="contacts">
+<div class="px">
+  <div class="eyebrow anim">Контакты</div>
+  <h2 class="stitle anim d1">Как нас найти</h2>
+  <div class="ccard anim d2">
+    <div class="cit">
+      <div class="ciico"><svg style="width:18px;height:18px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.32 19.79 19.79 0 01.02 0.67 2 2 0 012 .5h3a2 2 0 012 1.72 13 13 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.36A16 16 0 0015.64 17.9l1.22-1.22a2 2 0 012.11-.45 13 13 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+      <div><div class="clbl">Телефон</div><div class="cval"><a href="tel:+74952977775">+7 (495) 297-77-75</a></div></div>
+    </div>
+    <div class="cit">
+      <div class="ciico"><svg style="width:18px;height:18px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div><div class="clbl">Часы работы</div><div class="ctbig">8:00 — 20:00</div><div class="csub">Ежедневно, без выходных</div></div>
+    </div>
+    <div class="cit">
+      <div class="ciico"><svg style="width:18px;height:18px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <div><div class="clbl">Адрес</div><div class="cval">Саввинская наб., 25, стр. 1</div><div class="csub">Хамовники, Москва · 1 этаж</div></div>
+    </div>
+    <div class="cit">
+      <div class="ciico"><svg style="width:18px;height:18px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <div><div class="clbl">Оплата</div><div class="cval" style="font-size:14px">Наличные, карта, QR-код</div></div>
+    </div>
+    <a href="tel:+74952977775" class="btn b-blue b-full" style="margin-top:8px">
+      <svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.32 19.79 19.79 0 01.02 0.67 2 2 0 012 .5h3a2 2 0 012 1.72 13 13 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.36A16 16 0 0015.64 17.9l1.22-1.22a2 2 0 012.11-.45 13 13 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      Записаться на мойку
+    </a>
+  </div>
+  <div class="cexts anim d3">
+    <div class="cext">
+      <span style="font-size:20px;flex-shrink:0">🚇</span>
+      <div><div class="cxt-t">Ближайшее метро</div><div class="cxt-s">Фрунзенская, Парк Культуры</div></div>
+    </div>
+    <div class="cext yt">
+      <svg style="width:18px;height:18px;fill:var(--yellow);flex-shrink:0" viewBox="0 0 20 20"><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7"/></svg>
+      <div><div class="cxt-t">Хорошее место 2026</div><div class="cxt-s">Яндекс Карты · Рейтинг 4.9</div></div>
+    </div>
+    <a href="https://yandex.ru/maps/org/wash_me/183062604106/" target="_blank" class="cext" style="cursor:pointer">
+      <svg style="width:18px;height:18px;fill:none;stroke:var(--blue);stroke-width:1.8;stroke-linecap:round;flex-shrink:0" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <div><div class="cxt-t" style="color:var(--blue)">Открыть в Яндекс Картах</div><div class="cxt-s">Маршрут и отзывы</div></div>
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+    <div class="lmarks">
+      <div class="lm lm-drop" style="width:24px;height:24px"><svg style="width:10px;height:13px;fill:white" viewBox="0 0 16 20"><path d="M8 0C8 0 0 8 0 13a8 8 0 0016 0C16 8 8 0 8 0z"/></svg></div>
+      <div class="lm lm-wheel" style="width:24px;height:24px"><svg style="width:11px;height:11px;fill:none;stroke:white;stroke-width:1.6;stroke-linecap:round" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5"/><circle cx="9" cy="9" r="2" fill="white" stroke="none"/><line x1="9" y1="2" x2="9" y2="4.5"/><line x1="9" y1="13.5" x2="9" y2="16"/><line x1="2" y1="9" x2="4.5" y2="9"/><line x1="13.5" y1="9" x2="16" y2="9"/></svg></div>
+      <div class="lm lm-smile" style="width:24px;height:24px"><svg style="width:11px;height:11px;fill:none;stroke:white;stroke-width:1.6;stroke-linecap:round" viewBox="0 0 16 16"><circle cx="5.5" cy="6" r="1.2" fill="white" stroke="none"/><circle cx="10.5" cy="6" r="1.2" fill="white" stroke="none"/><path d="M4.5 10c1 2 6 2 7 0"/></svg></div>
+    </div>
+    <div><div class="lname">Wash Me</div><div class="lsub">Автомойка · Шиномонтаж</div></div>
+  </div>
+  <div class="ft-simple">
+    <div>
+      <div class="fch">Услуги</div>
+      <div class="flinks">
+        <a href="#pricing" onclick="sw('wash',document.querySelectorAll('.tab')[2])">Детейлинг мойка</a>
+        <a href="#pricing" onclick="sw('tire',document.querySelectorAll('.tab')[0])">Шиномонтаж</a>
+        <a href="#pricing" onclick="sw('polish',document.querySelectorAll('.tab')[3])">Полировка</a>
+        <a href="#pricing" onclick="sw('clean',document.querySelectorAll('.tab')[4])">Химчистка</a>
+      </div>
+    </div>
+    <div>
+      <div class="fch">Контакты</div>
+      <div class="flinks">
+        <a href="tel:+74952977775">+7 (495) 297-77-75</a>
+        <a href="#">Саввинская наб., 25, стр. 1</a>
+        <a href="#">8:00–20:00 ежедневно</a>
+        <a href="https://yandex.ru/maps/org/wash_me/183062604106/reviews/" target="_blank">Оставить отзыв</a>
+      </div>
+    </div>
+  </div>
+  <div class="fcp">© 2026 Wash Me. Все права защищены.</div>
+</div>
+</footer>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav" id="bnav">
+  <button class="bnav-item" onclick="scrollTo('#home')" id="bn-home">
+    <svg class="bni" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Главная
+  </button>
+  <button class="bnav-item" onclick="scrollTo('#services')" id="bn-services">
+    <svg class="bni" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="3" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="21" y2="12"/></svg>
+    Услуги
+  </button>
+  <a href="tel:+74952977775" class="bnav-item call">
+    <svg class="bni" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.32 19.79 19.79 0 01.02 0.67 2 2 0 012 .5h3a2 2 0 012 1.72 13 13 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.36A16 16 0 0015.64 17.9l1.22-1.22a2 2 0 012.11-.45 13 13 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+    Позвонить
+  </a>
+  <button class="bnav-item" onclick="scrollTo('#pricing')" id="bn-pricing">
+    <svg class="bni" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    Прайс
+  </button>
+  <button class="bnav-item" onclick="scrollTo('#contacts')" id="bn-contacts">
+    <svg class="bni" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    Адрес
+  </button>
+</nav>
+
+<script>
+// Theme
+const html=document.documentElement;
+const saved=localStorage.getItem("wm-theme")||"light";
+html.setAttribute("data-theme",saved);
+document.getElementById("themeToggle").addEventListener("click",()=>{
+  const n=html.getAttribute("data-theme")==="light"?"dark":"light";
+  html.setAttribute("data-theme",n);localStorage.setItem("wm-theme",n);
+});
+// Tabs
+function sw(id,btn){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+  if(btn&&btn.classList)btn.classList.add("on");
+  const p=document.getElementById("p-"+id);if(p)p.classList.add("on");
+  setTimeout(()=>document.getElementById("pricing").scrollIntoView({behavior:"smooth",block:"start"}),50);
+}
+// Scroll helper
+function scrollTo(sel){
+  const el=document.querySelector(sel);if(el)el.scrollIntoView({behavior:"smooth"});
+}
+// Scroll animations
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add("vis")}),{threshold:.08});
+document.querySelectorAll(".anim").forEach(el=>obs.observe(el));
+// Bottom nav active state
+const sections=["home","services","pricing","reviews","contacts"];
+const btns={home:"bn-home",services:"bn-services",pricing:"bn-pricing",reviews:"bn-pricing",contacts:"bn-contacts"};
+const sObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll(".bnav-item").forEach(b=>b.classList.remove("on"));
+      const bid=btns[e.target.id];
+      if(bid){const b=document.getElementById(bid);if(b)b.classList.add("on");}
+    }
+  });
+},{threshold:.4,rootMargin:"-10% 0px -50% 0px"});
+sections.forEach(id=>{const el=document.getElementById(id);if(el)sObs.observe(el);});
+// Scroll dot animation for cards
+document.querySelectorAll(".sscroll,.rscroll,.fscroll").forEach(sc=>{
+  sc.addEventListener("scroll",()=>{
+    const dots=sc.nextElementSibling?.querySelector(".sh-dots");
+    if(!dots)return;
+    const progress=sc.scrollLeft/(sc.scrollWidth-sc.clientWidth);
+    const allDots=dots.querySelectorAll(".sh-dot");
+    allDots.forEach((d,i)=>{
+      d.classList.toggle("a",Math.round(progress*(allDots.length-1))===i);
+    });
+  });
+});
+</script>
+</body>
+</html>
